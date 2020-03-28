@@ -1,0 +1,16 @@
+{
+  "name": "@inbloxme/inblox-handlename-package",
+  "version": "1.0.2",
+  "description": "Package for interacting with the Inblox Handlename Smart Contracts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethereumjs-tx": "^2.1.2",
+    "web3": "^1.2.6"
+  },
+  "devDependencies": {}
+}
