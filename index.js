@@ -5,15 +5,19 @@ const { storageContractABI } = require('./ABI/storage-contract');
 const { mainContractAddress, storageContractAddress } = require('./config');
 
 class InbloxHandlename {
-    constructor(infuraKey) {
-        this.web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
+    constructor({ infuraKey, rpcUrl }) {
+        if (!rpcUrl) {
+            this.web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
+        } else {
+            this.web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+        }
         this.MainContractAddress = mainContractAddress;
         this.MainContractABI = mainContractABI;
-        this.StorageContractAddress = storageContractAddress
-        this.StorageContractABI = storageContractABI
+        this.StorageContractAddress = storageContractAddress;
+        this.StorageContractABI = storageContractABI;
         this.MainContract = new this.web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
         this.StorageContract = new this.web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
-    }
+    }   
 
     // POST method reusable code
     async sendTransaction(payload) {
