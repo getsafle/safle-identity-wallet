@@ -3,7 +3,7 @@ const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./ABI/main-contract');
 const { storageContractABI } = require('./ABI/storage-contract');
 const { mainContractAddress, storageContractAddress } = require('./config');
-const utils=require('./utils/index')
+const utils = require('./utils/index')
 
 class InbloxHandlename {
     constructor({ infuraKey, rpcUrl }) {
@@ -17,25 +17,26 @@ class InbloxHandlename {
             this.MainContract = new this.web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
             this.StorageContract = new this.web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
 
-            return this; 
+            return this;
         })();
-    }   
+    }
 
-    async connectNode({ infuraKey, rpcUrl }){      
+    async connectNode({ infuraKey, rpcUrl }) {
 
         let web3;
         if (infuraKey) {
-             web3 =await new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
-             web3.eth.net.isListening()
-             .then(() => console.log('connected to', infuraKey))
-             .catch((e) => console.log('invalid infurakey','Please provide a valid infuraKey'));
-            } 
-            else {
-            web3 = await new Web3(new Web3.providers.HttpProvider(rpcUrl));
-            }
+            web3 = await new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
             web3.eth.net.isListening()
-            .then(() => console.log('connected to', rpcUrl))
-            .catch((e) => console.log('invalid rpcUrl',rpcUrl,'Please provide a valid RPC URL.'));
+                .then(() => console.log('connected to', infuraKey))
+                .catch((e) => console.log('invalid infurakey', 'Please provide a valid infuraKey'));
+        }
+        else {
+            web3 = await new Web3(new Web3.providers.HttpProvider(rpcUrl));
+
+            web3.eth.net.isListening()
+                .then(() => console.log('connected to', rpcUrl))
+                .catch((e) => console.log('invalid rpcUrl', rpcUrl, 'Please provide a valid RPC URL.'));
+        }
         return web3;
     }
 
