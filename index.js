@@ -3,39 +3,65 @@ const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./ABI/main-contract');
 const { storageContractABI } = require('./ABI/storage-contract');
 const { mainContractAddress, storageContractAddress } = require('./config');
-const utils=require('./utils/index')
 
+let web3;
+
+// POST method reusable code
+sendTransaction = async function(payload) {
+    try {
+        const { encodedABI, gas, from, to, privateKey, value } = payload;
+
+        const gasPrice = await web3.eth.getGasPrice();
+        const count = await web3.eth.getTransactionCount(from);
+        const nonce = await web3.utils.toHex(count);
+
+        const rawTx = {
+            from,
+            value: web3.utils.numberToHex(value),
+            nonce: web3.utils.numberToHex(nonce),
+            to,
+            gas: web3.utils.numberToHex(gas),
+            gasPrice: web3.utils.numberToHex(gasPrice),
+            data: encodedABI,
+            chainId: 3,
+        };
+        const pkey = Buffer.from(privateKey, 'hex');
+        const tx = new Tx(rawTx, { chain: 'ropsten', hardfork: 'petersburg' });
+
+        tx.sign(pkey);
+        const stringTx = `0x${tx.serialize().toString('hex')}`;
+
+        const response = await web3.eth.sendSignedTransaction(stringTx);
+        return response;
+    } catch (error) {
+        return { error: [{ name: 'address & handlename', message: error.message }] };
+    }
+}
+
+//  Function to check handlename validity
+async function isHandlenameValid(handlename) {
+    const handlenameLength = handlename.length;
+
+    if (4 <= handlenameLength && handlenameLength <= 16 && handlename.match(/^[0-9a-z]+$/i) !== null) {
+        return true;
+    }
+    return false;
+}
 
 class InbloxHandlename {
     constructor({ infuraKey, rpcUrl }) {
-
-        return (async () => {
-
-            this.web3 = await this.connectNode({ infuraKey, rpcUrl });
-            this.MainContractAddress = mainContractAddress;
-            this.MainContractABI = mainContractABI;
-            this.StorageContractAddress = storageContractAddress;
-            this.StorageContractABI = storageContractABI;
-            this.MainContract = new this.web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
-            this.StorageContract = new this.web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
-
-            return this; 
-        })();
-    }   
-
-    async connectNode({ infuraKey, rpcUrl }){      
-        let web3;
         if (!rpcUrl) {
-             web3 =await new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
+            web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
         } else {
-            web3 = await new Web3(new Web3.providers.HttpProvider(rpcUrl));
-            }
-            web3.eth.net.isListening()
-            .then(() => console.log('connected to', rpcUrl))
-            .catch((e) => console.log('invalid rpcUrl',rpcUrl,'Please provide a valid RPC URL.'));
-        return web3;
-    }
-
+            web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+        }
+        this.MainContractAddress = mainContractAddress;
+        this.MainContractABI = mainContractABI;
+        this.StorageContractAddress = storageContractAddress;
+        this.StorageContractABI = storageContractABI;
+        this.MainContract = new web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
+        this.StorageContract = new web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
+    }   
 
     //  Get the status of handlename registration
     async isHandlenameRegistrationPaused() {
@@ -59,7 +85,6 @@ class InbloxHandlename {
 
     //  Get the handlename from address
     async resolveHandleNameFromAddress(userAddress) {
-
         try {
             const userHandlename = await this.StorageContract.methods.resolveHandleName(userAddress).call();
             return userHandlename;
@@ -70,7 +95,6 @@ class InbloxHandlename {
 
     //  Resolve the user's address from their handlename
     async resolveAddressFromHandleName(handleName) {
-
         const userAddress = await this.StorageContract.methods.resolveHandleNameString(handleName).call();
         return userAddress;
     }
@@ -86,22 +110,18 @@ class InbloxHandlename {
     async setHandlename(payload) {
         const { userAddress, handleName, from, privateKey } = payload;
 
-        const handlename = await this.resolveHandleNameFromAddress(userAddress);
         const fees = await this.handlenameFees();
-        const check = await utils.handlenameConditions({ handleName, from });
+        const isHNValid = await isHandlenameValid(handleName);
 
-        if (handlename !== "Invalid address.") {
-            return "This address is already registered to another handlename."
-        } else if (check !== true) {
-            return check;
+        if(isHNValid === false) {
+            return "Handlename should be 4-16 characters alphanumeric string."
         }
 
         try {
             const encodedABI = await this.MainContract.methods.addHandleName(userAddress, handleName).encodeABI();
-            let gas = await this.MainContract.methods.addHandleName(userAddress, handleName).estimateGas({ from, value: fees });
-            gas = Math.round(parseFloat(gas) * 1.5);
+            let gas = 4000000;
 
-            const response = await utils.sendTransaction({ encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees })
+            const response = await sendTransaction({ encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees })
 
             return response;
         } catch (error) {
@@ -115,22 +135,19 @@ class InbloxHandlename {
 
         const updateCount = await this.handlenameUpdateCount({ address: userAddress });
         const fees = await this.handlenameFees();
-        const check = await utils.handlenameConditions({ handleName: newHandleName, from });
+        const isHNValid = await isHandlenameValid(newHandleName);
 
         if (updateCount >= 2) {
             return "Handlenames cannot be updated more than twice.";
-        } else if (check !== true) {
-            return check;
+        } else if (isHNValid === false) {
+            return "Handlename should be 4-16 characters alphanumeric string."
         }
 
         try {
             const encodedABI = await this.MainContract.methods.updateHandleNameOfUser(userAddress, newHandleName).encodeABI();
-            let gas = await this.MainContract.methods
-                .updateHandleNameOfUser(userAddress, newHandleName)
-                .estimateGas({ from, value: fees });
-            gas = Math.round(parseFloat(gas) * 1.5);
+            let gas = 4000000;
 
-            const response = await utils.sendTransaction({ encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees })
+            const response = await sendTransaction({ encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees })
 
             return response;
         } catch (error) {
