@@ -9,7 +9,7 @@ class InbloxHandlename {
     constructor({ infuraKey, rpcUrl }) {
 
         return (async () => {
-            this.web3 = await this.connectNode({ infuraKey, rpcUrl });
+            this.web3 = await this.connectNode({ infuraKey, rpcUrl });           
             this.MainContractAddress = mainContractAddress;
             this.MainContractABI = mainContractABI;
             this.StorageContractAddress = storageContractAddress;
@@ -22,25 +22,23 @@ class InbloxHandlename {
     }
 
     async connectNode({ infuraKey, rpcUrl }) {
-
         let web3;
+        let isConnected=false;
         if (infuraKey) {
             web3 = await new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
             web3.eth.net.isListening()
-                .then(() => console.log('connected to', infuraKey))
-                .catch((e) => console.log('invalid infurakey', 'Please provide a valid infuraKey'));
+                .then(() => console.log('connected to ',infuraKey))
+                .catch((e) =>  {  console.log("Invalid or Infura API key ", infuraKey," Please provide correct details"); process.exit(1) });
         }
         else {
             web3 = await new Web3(new Web3.providers.HttpProvider(rpcUrl));
-
             web3.eth.net.isListening()
-                .then(() => console.log('connected to', rpcUrl))
-                .catch((e) => console.log('invalid rpcUrl', rpcUrl, 'Please provide a valid RPC URL.'));
-        }
+                .then(() => console.log('connected to ',rpcUrl))
+                .catch((e) =>  {  console.log("Invalid RPC URL ",rpcUrl," Please provide correct details"); process.exit(1) });
+        }   
         return web3;
     }
-
-
+    
     //  Get the status of handlename registration
     async isHandlenameRegistrationPaused() {
         const isHandlenameRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();

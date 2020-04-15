@@ -1,12 +1,14 @@
+const index=require('../index');
+
 
     // POST method reusable code
      sendTransaction=(async(payload)=> {
         try {
             const { encodedABI, gas, from, to, privateKey, value } = payload;
 
-            const gasPrice = await this.web3.eth.getGasPrice();
-            const count = await this.web3.eth.getTransactionCount(from);
-            const nonce = await this.web3.utils.toHex(count);
+            const gasPrice = await web3.eth.getGasPrice();
+            const count = await web3.eth.getTransactionCount(from);
+            const nonce = await web3.utils.toHex(count);
 
             const rawTx = {
                 from,
