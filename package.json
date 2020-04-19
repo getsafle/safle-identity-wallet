@@ -4,7 +4,9 @@
   "description": "Package for interacting with the Inblox Handlename Smart Contracts.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm-run-all --silent test-*",
+    "test-audit": "npm audit ---audit-level=high",
+    "test-lint": "eslint ./*.js ./config ./ABI '*.js'"
   },
   "author": "",
   "license": "ISC",
@@ -12,5 +14,12 @@
     "ethereumjs-tx": "^2.1.2",
     "web3": "^1.2.6"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-filenames": "^1.3.2",
+    "eslint-plugin-import": "^2.20.2",
+    "npm-run-all": "^4.1.5"
+  }
 }
