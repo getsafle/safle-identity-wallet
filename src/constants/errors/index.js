@@ -7,4 +7,5 @@ module.exports = {
 
   REGISTERED_ADDRESS: 'This address is already registered to another handlename.',
   HN_MAX_COUNT: 'Handlenames cannot be updated more than twice.',
+  INVALID_INPUT: 'Please check the input.',
 };

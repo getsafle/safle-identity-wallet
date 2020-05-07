@@ -4,7 +4,7 @@ const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const { mainContractAddress, storageContractAddress } = require('./constants/config');
 const {
-  INVALID_HANDLENAME, INVALID_REGISTRAR, HN_REGISTRATION_PAUSED, REGISTERED_HANDLENAME, INVALID_ADDRESS, REGISTERED_ADDRESS, HN_MAX_COUNT,
+  INVALID_HANDLENAME, INVALID_REGISTRAR, HN_REGISTRATION_PAUSED, REGISTERED_HANDLENAME, INVALID_ADDRESS, REGISTERED_ADDRESS, HN_MAX_COUNT, INVALID_INPUT,
 } = require('./constants/errors');
 
 class InbloxHandlename {
@@ -83,9 +83,13 @@ class InbloxHandlename {
     try {
       const registrarDetails = await this.StorageContract.methods.Registrars(address).call();
 
+      if (registrarDetails.isRegisteredRegistrar === false) {
+        return INVALID_REGISTRAR;
+      }
+
       return registrarDetails;
     } catch (error) {
-      return INVALID_REGISTRAR;
+      return INVALID_INPUT;
     }
   }
 
@@ -206,7 +210,7 @@ class InbloxHandlename {
 
       return response;
     } catch (error) {
-      return 'Please check all the inputs.';
+      return INVALID_INPUT;
     }
   }
 }
