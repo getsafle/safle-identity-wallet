@@ -1,8 +1,11 @@
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
-const { mainContractABI } = require('./ABI/main-contract');
-const { storageContractABI } = require('./ABI/storage-contract');
-const { mainContractAddress, storageContractAddress } = require('./config');
+const { mainContractABI } = require('./constants/ABI/main-contract');
+const { storageContractABI } = require('./constants/ABI/storage-contract');
+const { mainContractAddress, storageContractAddress } = require('./constants/config');
+const {
+  INVALID_HANDLENAME, INVALID_REGISTRAR, HN_REGISTRATION_PAUSED, REGISTERED_HANDLENAME, INVALID_ADDRESS, REGISTERED_ADDRESS, HN_MAX_COUNT,
+} = require('./constants/errors');
 
 class InbloxHandlename {
   constructor({ infuraKey, rpcUrl }) {
@@ -12,6 +15,7 @@ class InbloxHandlename {
       this.web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
     }
     this.MainContractAddress = mainContractAddress;
+
     this.MainContractABI = mainContractABI;
     this.StorageContractAddress = storageContractAddress;
     this.StorageContractABI = storageContractABI;
@@ -62,13 +66,13 @@ class InbloxHandlename {
     const isRegistrationPaused = await this.isHandlenameRegistrationPaused();
 
     if (handlenameValid === false) {
-      return 'The handlename have to be alphanumeric and length should be between 4-16.';
-    } if (registrar === 'This address is not a valid registrar.') {
+      return INVALID_HANDLENAME;
+    } if (registrar === INVALID_REGISTRAR) {
       return registrar;
     } if (address !== '0x0000000000000000000000000000000000000000') {
-      return 'This handlename is already taken.';
-    } if (isRegistrationPaused === 'Handlename registration is paused.') {
-      return isRegistrationPaused;
+      return REGISTERED_HANDLENAME;
+    } if (isRegistrationPaused === true) {
+      return HN_REGISTRATION_PAUSED;
     }
 
     return true;
@@ -81,7 +85,7 @@ class InbloxHandlename {
 
       return registrarDetails;
     } catch (error) {
-      return 'This address is not a valid registrar.';
+      return INVALID_REGISTRAR;
     }
   }
 
@@ -101,11 +105,7 @@ class InbloxHandlename {
   async isHandlenameRegistrationPaused() {
     const isHandlenameRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();
 
-    if (isHandlenameRegistrationPaused === true) {
-      return 'Handlename registration is paused.';
-    }
-
-    return 'Handlename registration is not paused.';
+    return isHandlenameRegistrationPaused;
   }
 
   //  Get the number of times the user updated their handlename
@@ -115,7 +115,7 @@ class InbloxHandlename {
 
       return updateCount;
     } catch (error) {
-      return 'Invalid address.';
+      return INVALID_ADDRESS;
     }
   }
 
@@ -126,7 +126,7 @@ class InbloxHandlename {
 
       return userHandlename;
     } catch (error) {
-      return 'Invalid address.';
+      return INVALID_ADDRESS;
     }
   }
 
@@ -154,8 +154,8 @@ class InbloxHandlename {
     const fees = await this.handlenameFees();
     const check = await this.handlenameConditions({ handleName, from });
 
-    if (handlename !== 'Invalid address.') {
-      return 'This address is already registered to another handlename.';
+    if (handlename !== INVALID_ADDRESS) {
+      return REGISTERED_ADDRESS;
     } if (check !== true) {
       return check;
     }
@@ -187,7 +187,7 @@ class InbloxHandlename {
     const check = await this.handlenameConditions({ handleName: newHandleName, from });
 
     if (updateCount >= 2) {
-      return 'Handlenames cannot be updated more than twice.';
+      return HN_MAX_COUNT;
     } if (check !== true) {
       return check;
     }
