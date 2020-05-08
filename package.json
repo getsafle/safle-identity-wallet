@@ -2,11 +2,11 @@
   "name": "@inbloxme/inblox-handlename-package",
   "version": "1.0.2",
   "description": "Package for interacting with the Inblox Handlename Smart Contracts.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "npm-run-all --silent test-*",
     "test-audit": "npm audit ---audit-level=high",
-    "test-lint": "eslint ./*.js ./config ./ABI '*.js'"
+    "test-lint": "eslint ./src/**/*.js"
   },
   "author": "",
   "license": "ISC",
