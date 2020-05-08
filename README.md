@@ -1,8 +1,14 @@
 # Inblox Handlename Package
 
-## How to use
+This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update handlename for the user.
 
-Install the package using
+> **Disclaimer - This is WIP, and release in alpha.**
+
+## Installation and Usage
+
+> Installation
+
+Install the package by running the command,
 
 ```npm install @inbloxme/inblox-handlename-package```
 
@@ -10,16 +16,22 @@ Import the package into your project using,
 
 ```const inbloxHandlename = require('@inbloxme/inblox-handlename-package').InbloxHandlename;```
 
-Initialise the constructor using your Infura secret key like this,
+> Initialising
 
-```const handlename = new inbloxHandlename('YOUR_INFURA_KEY');```
+Initialise the constructor using your Infura secret key or RPC URL like this,
 
-Now you can set the handlename for other users using the function,
+```const handlename = new inbloxHandlename('YOUR_INFURA_KEY' or 'RPC URL');```
+
+> Set Handlename using
 
 ```const setHandlename = await handlename.setHandlename({ userAddress, handleName, from, privateKey });```
 
 ### List of all functions
+
+> Set Handlename
+
 ---
+
 * ```setHandlename()```
 
 #### Inputs
@@ -32,6 +44,8 @@ Now you can set the handlename for other users using the function,
 #### Output
 
 Transaction details.
+
+> Update Handlename
 
 ___
 
@@ -48,6 +62,8 @@ ___
 
 Transaction details.
 
+> Check if Handlename registration is paused,
+
 ---
 
 * ```isHandlenameRegistrationPaused()```
@@ -60,6 +76,8 @@ No inputs.
 
 If registration is paused - ```Handlename registration is paused.```
 If registration is not paused - ```Handlename registration is not paused.```
+
+> Handlename update count
 
 ---
 
@@ -74,6 +92,8 @@ If registration is not paused - ```Handlename registration is not paused.```
 update count
 If invalid or wrong address - ```Invalid address.```
 
+> Retrieve the handlename of a particular address
+
 ---
 
 * ```resolveHandleNameFromAddress()```
@@ -87,6 +107,8 @@ If invalid or wrong address - ```Invalid address.```
 Handlename of the user
 If invalid or wrong address - ```Invalid address.```
 
+> Retrieve the address of a particular handlename
+
 ---
 
 * ```resolveAddressFromHandleName()```
@@ -99,6 +121,8 @@ If invalid or wrong address - ```Invalid address.```
 
 Address of the user.
 
+> Get the current handlename registration fees
+
 ---
 
 * ```handlenameFees()```
@@ -106,3 +130,11 @@ Address of the user.
 #### Output
 
 Handlename registration fees.
+
+## WIP
+
+Want to contribute, we would :heart: that!
+
+We are a Global :earth_asia::earth_africa::earth_americas: team! :muscle:
+
+Write to dev@inblox.me, or follow us on twitter, [https://twitter.com/inblox_me](https://twitter.com/inblox_me)
