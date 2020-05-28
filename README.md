@@ -1,4 +1,4 @@
-# Inblox Handlename Package
+# InbloxMe Identity Wallet
 
 This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update handlename for the user.
 
@@ -10,11 +10,11 @@ This package is used to interact with Inblox smart contracts. Registered Registr
 
 Install the package by running the command,
 
-```npm install @inbloxme/inblox-handlename-package```
+```npm install @inbloxme/inbloxme-identity-wallet```
 
 Import the package into your project using,
 
-```const inbloxHandlename = require('@inbloxme/inblox-handlename-package').InbloxHandlename;```
+```const inbloxHandlename = require('@inbloxme/inbloxme-identity-wallet').InbloxHandlename;```
 
 > Initialising
 
