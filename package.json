@@ -1,11 +1,11 @@
 {
-  "name": "@inbloxme/inblox-handlename-package",
-  "version": "1.0.2",
+  "name": "@inbloxme/inbloxme-identity-wallet",
+  "version": "1.0.0",
   "description": "Package for interacting with the Inblox Handlename Smart Contracts.",
   "main": "src/index.js",
   "scripts": {
     "test": "npm-run-all --silent test-*",
-    "test-audit": "npm audit ---audit-level=high",
+    "test-audit": "npm audit ---audit-level=moderate",
     "test-lint": "eslint ./src/**/*.js"
   },
   "author": "",

@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
-const { mainContractAddress, storageContractAddress } = require('./constants/config');
+const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./constants/config');
 const {
   INVALID_HANDLENAME, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT,
 } = require('./constants/errors');
@@ -62,9 +62,9 @@ class InbloxHandlename {
     } else {
       web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
     }
-    this.MainContractAddress = mainContractAddress;
+    this.MainContractAddress = MAIN_CONTRACT_ADDRESS;
     this.MainContractABI = mainContractABI;
-    this.StorageContractAddress = storageContractAddress;
+    this.StorageContractAddress = STORAGE_CONTRACT_ADDRESS;
     this.StorageContractABI = storageContractABI;
     this.MainContract = new web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
     this.StorageContract = new web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);

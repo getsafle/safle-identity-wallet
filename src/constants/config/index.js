@@ -1,4 +1,4 @@
 module.exports = {
-  mainContractAddress: '0xd7b21e16fde9ae64281856a696dda5f7869ba855',
-  storageContractAddress: '0xec019b5e380114c7c9b7fa3d5bf24d040aaa2f42',
+  MAIN_CONTRACT_ADDRESS: '0x752d65194980b0b162de664459978a498cc56d7b',
+  STORAGE_CONTRACT_ADDRESS: '0x4a24fb528c0896c3d2de4726d17a3e1305c6312a',
 };
