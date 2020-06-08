@@ -2,6 +2,9 @@
 
 This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update handlename for the user.
 
+For now the registrar process is manual, if you want to become one, drop us an email or engage on our social media channels.
+We will be making it democratic and decentralised soon, it's already in the smart contracts [Hint: You can build on it by yourself too!].
+
 > **Disclaimer - This is WIP, and release in alpha.**
 
 ## Installation and Usage
