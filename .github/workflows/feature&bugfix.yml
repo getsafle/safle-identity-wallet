@@ -8,13 +8,16 @@ on:
     branches:
       - feature-*
       - bugfix-*
-  pull_request:
-    branches:
-      - feature-*
-      - bugfix-*
     paths:
       - package.json
       - CHANGELOG
+  pull_request:
+    branches:
+      - feature-*
+    paths:
+      - package.json
+      - CHANGELOG
+      - bugfix-*
 
 jobs:
   build:
