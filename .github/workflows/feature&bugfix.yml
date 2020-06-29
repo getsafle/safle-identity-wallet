@@ -14,10 +14,10 @@ on:
   pull_request:
     branches:
       - feature-*
+      - bugfix-*
     paths:
       - package.json
       - CHANGELOG
-      - bugfix-*
 
 jobs:
   build:
