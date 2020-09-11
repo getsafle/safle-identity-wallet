@@ -4,7 +4,7 @@ const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./constants/config');
 const {
-  INVALID_HANDLENAME, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT,
+  INVALID_HANDLENAME, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT, HANDLENAME_REG_ON_HOLD, HANDLENAME_ALREADY_TAKEN,
 } = require('./constants/errors');
 
 let web3;
@@ -146,7 +146,19 @@ class InbloxHandlename {
       userAddress, newHandleName, from, privateKey,
     } = payload;
 
-    const updateCount = await this.handlenameUpdateCount({ address: userAddress });
+    const isHandlenameRegOnHold = await this.isHandlenameRegistrationPaused();
+
+    if (isHandlenameRegOnHold) {
+      return HANDLENAME_REG_ON_HOLD;
+    }
+
+    const addressOfHandlename = await this.resolveAddressFromHandleName(newHandleName);
+
+    if (addressOfHandlename !== '0x0000000000000000000000000000000000000000') {
+      return HANDLENAME_ALREADY_TAKEN;
+    }
+
+    const updateCount = await this.handlenameUpdateCount(userAddress);
     const fees = await this.handlenameFees();
     const isHNValid = await isHandlenameValid(newHandleName);
 
