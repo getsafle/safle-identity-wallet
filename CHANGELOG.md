@@ -4,3 +4,4 @@
 
 * Added Github pipelines for master, feature and bugfix branch.
 * Added CHANGELOG file.
+
