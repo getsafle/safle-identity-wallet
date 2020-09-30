@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
-const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./constants/config');
+const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./config');
 const {
   INVALID_HANDLENAME, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT, HANDLENAME_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, HANDLENAME_ALREADY_TAKEN,
 } = require('./constants/errors');
