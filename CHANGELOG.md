@@ -17,3 +17,9 @@
 ##### Features updated
 
 * Updated updateHandlename Method
+
+#### 1.0.4 (2020-06-29)
+
+##### Updated Contract Address
+
+* Updated the contract addresses as per the new deployments on ropsten.
