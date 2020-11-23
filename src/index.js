@@ -4,7 +4,7 @@ const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./config');
 const {
-  INVALID_HANDLENAME, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT, HANDLENAME_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, HANDLENAME_ALREADY_TAKEN,
+  INVALID_INBLOXID, INVALID_ADDRESS, INBLOXID_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
 } = require('./constants/errors');
 
 let web3;
@@ -40,22 +40,22 @@ async function sendTransaction(payload) {
 
     return response;
   } catch (error) {
-    return { error: [ { name: 'address & handlename', message: error.message } ] };
+    return { error: [ { name: 'address & inblox id', message: error.message } ] };
   }
 }
 
-//  Function to check handlename validity
-async function isHandlenameValid(handlename) {
-  const handlenameLength = handlename.length;
+//  Function to check Inblox ID validity
+async function isInbloxIdValid(inbloxId) {
+  const inbloxIdLength = inbloxId.length;
 
-  if (handlenameLength >= 4 && handlenameLength <= 16 && handlename.match(/^[0-9a-z]+$/i) !== null) {
+  if (inbloxIdLength >= 4 && inbloxIdLength <= 16 && inbloxIdLength.match(/^[0-9a-z]+$/i) !== null) {
     return true;
   }
 
   return false;
 }
 
-class InbloxHandlename {
+class InbloxID {
   constructor({ infuraKey, rpcUrl }) {
     if (!rpcUrl) {
       web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
@@ -70,15 +70,15 @@ class InbloxHandlename {
     this.StorageContract = new web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
   }
 
-  //  Get the status of handlename registration
-  async isHandlenameRegistrationPaused() {
-    const isHandlenameRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();
+  //  Get the status of Inblox ID registration
+  async isRegistrationPaused() {
+    const isRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();
 
-    return isHandlenameRegistrationPaused;
+    return isRegistrationPaused;
   }
 
-  //  Get the number of times the user updated their handlename
-  async handlenameUpdateCount(address) {
+  //  Get the number of times the user updated their Inblox ID
+  async getUpdateCount(address) {
     try {
       const updateCount = await this.StorageContract.methods.updateCount(address).call();
 
@@ -88,64 +88,64 @@ class InbloxHandlename {
     }
   }
 
-  //  Get the handlename from address
-  async resolveHandleNameFromAddress(userAddress) {
+  //  Get the Inblox ID from address
+  async getInbloxId(userAddress) {
     try {
-      const userHandlename = await this.StorageContract.methods.resolveHandleName(userAddress).call();
+      const userInbloxID = await this.StorageContract.methods.resolveHandleName(userAddress).call();
 
-      return userHandlename;
+      return userInbloxID;
     } catch (error) {
       return INVALID_ADDRESS;
     }
   }
 
-  //  Resolve the user's address from their handlename
-  async resolveAddressFromHandleName(handleName) {
-    const userAddress = await this.StorageContract.methods.resolveHandleNameString(handleName).call();
+  //  Resolve the user's address from their Inblox ID
+  async getAddress(inbloxID) {
+    const userAddress = await this.StorageContract.methods.resolveHandleNameString(inbloxID).call();
 
     return userAddress;
   }
 
-  //  Get the handlename registration fees
-  async handlenameFees() {
-    const handlenameFees = await this.MainContract.methods.userHandleNameRegFees().call();
+  //  Get the Inblox ID registration fees
+  async inbloxIdFees() {
+    const inbloxIdFees = await this.MainContract.methods.userHandleNameRegFees().call();
 
-    return handlenameFees;
+    return inbloxIdFees;
   }
 
-  //  Register a new user with handlename
-  async setHandlename(payload) {
+  //  Register a new user with Inblox ID
+  async setInbloxId(payload) {
     const {
-      userAddress, handleName, from, privateKey,
+      userAddress, inbloxId, from, privateKey,
     } = payload;
 
-    const isHandlenameRegOnHold = await this.isHandlenameRegistrationPaused();
+    const isInbloxIDRegOnHold = await this.isRegistrationPaused();
 
-    if (isHandlenameRegOnHold) {
-      return HANDLENAME_REG_ON_HOLD;
+    if (isInbloxIDRegOnHold) {
+      return INBLOXID_REG_ON_HOLD;
     }
 
-    const isAddressTaken = await this.resolveHandleNameFromAddress(userAddress);
+    const isAddressTaken = await this.getInbloxId(userAddress);
 
     if (isAddressTaken !== 'Invalid address.') {
       return ADDRESS_ALREADY_TAKEN;
     }
 
-    const addressOfHandlename = await this.resolveAddressFromHandleName(handleName);
+    const addressOfInbloxId = await this.getAddress(inbloxId);
 
-    if (addressOfHandlename !== '0x0000000000000000000000000000000000000000') {
-      return HANDLENAME_ALREADY_TAKEN;
+    if (addressOfInbloxId !== '0x0000000000000000000000000000000000000000') {
+      return INBLOXID_ALREADY_TAKEN;
     }
 
-    const fees = await this.handlenameFees();
-    const isHNValid = await isHandlenameValid(handleName);
+    const fees = await this.inbloxIdFees();
+    const isInbloxIDValid = await isInbloxIdValid(inbloxId);
 
-    if (isHNValid === false) {
-      return INVALID_HANDLENAME;
+    if (isInbloxIDValid === false) {
+      return INVALID_INBLOXID;
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.addHandleName(userAddress, handleName).encodeABI();
+      const encodedABI = await this.MainContract.methods.addHandleName(userAddress, inbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -158,36 +158,36 @@ class InbloxHandlename {
     }
   }
 
-  //  Update handlename of the user
-  async updateHandlename(payload) {
+  //  Update Inblox ID of the user
+  async updateInbloxId(payload) {
     const {
-      userAddress, newHandleName, from, privateKey,
+      userAddress, newInbloxId, from, privateKey,
     } = payload;
 
-    const isHandlenameRegOnHold = await this.isHandlenameRegistrationPaused();
+    const isInbloxIdRegOnHold = await this.isRegistrationPaused();
 
-    if (isHandlenameRegOnHold) {
-      return HANDLENAME_REG_ON_HOLD;
+    if (isInbloxIdRegOnHold) {
+      return INBLOXID_REG_ON_HOLD;
     }
 
-    const addressOfHandlename = await this.resolveAddressFromHandleName(newHandleName);
+    const addressOfInbloxId = await this.getAddress(newInbloxId);
 
-    if (addressOfHandlename !== '0x0000000000000000000000000000000000000000') {
-      return HANDLENAME_ALREADY_TAKEN;
+    if (addressOfInbloxId !== '0x0000000000000000000000000000000000000000') {
+      return INBLOXID_ALREADY_TAKEN;
     }
 
-    const updateCount = await this.handlenameUpdateCount(userAddress);
-    const fees = await this.handlenameFees();
-    const isHNValid = await isHandlenameValid(newHandleName);
+    const updateCount = await this.getUpdateCount(userAddress);
+    const fees = await this.inbloxIdFees();
+    const isInbloxIDValid = await isInbloxIdValid(newInbloxId);
 
     if (updateCount >= 2) {
-      return HN_MAX_COUNT;
-    } if (isHNValid === false) {
-      return INVALID_HANDLENAME;
+      return INBLOXID_MAX_COUNT;
+    } if (isInbloxIDValid === false) {
+      return INVALID_INBLOXID;
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.updateHandleNameOfUser(userAddress, newHandleName).encodeABI();
+      const encodedABI = await this.MainContract.methods.updateHandleNameOfUser(userAddress, newInbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -201,4 +201,4 @@ class InbloxHandlename {
   }
 }
 
-module.exports = { InbloxHandlename };
+module.exports = { InbloxID };

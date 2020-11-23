@@ -23,3 +23,7 @@
 ##### Updated Contract Address
 
 * Updated the contract addresses as per the new deployments on ropsten.
+#### 1.0.5 (2020-11-19)
+
+##### Updated naming convention from Inblox Handle Name to InbloxID
+

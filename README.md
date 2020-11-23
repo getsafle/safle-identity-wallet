@@ -1,11 +1,10 @@
 # InbloxMe Identity Wallet
 
-This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update handlename for the user.
+This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update inblox id for the user.
 
 Anyone can use this for Inblox Identity Resolution.
 
-For now the registrar process is manual, if you want to become one, drop us an email or engage on our social media channels.
-We will be making it democratic and decentralised soon, it's already in the smart contracts [Hint: You can build on it by yourself too!].
+For now the registrar process is manual, if you want to become one, drop us an email or engage on our social media channels. We will be making it democratic and decentralized soon, it's already in the smart contracts [Hint: You can build on it by yourself too!].
 
 > **Disclaimer - This is WIP, and release in alpha.**
 
@@ -19,30 +18,27 @@ Install the package by running the command,
 
 Import the package into your project using,
 
-```const inbloxHandlename = require('@inbloxme/inbloxme-identity-wallet').InbloxHandlename;```
+```const inbloxId = require('@inbloxme/inbloxme-identity-wallet').InbloxID;```
 
 > Initialising
 
 Initialise the constructor using your Infura secret key or RPC URL like this,
 
-```const handlename = new inbloxHandlename('YOUR_INFURA_KEY' or 'RPC URL');```
+```const inbloxid = new inbloxId({ infuraKey, rpcUrl });```
 
-> Set Handlename using
-
-```const setHandlename = await handlename.setHandlename({ userAddress, handleName, from, privateKey });```
 
 ### List of all functions
 
-> Set Handlename
+> Set Inblox ID
 
 ---
 
-* ```setHandlename()```
+* ```setInbloxId()```
 
 #### Inputs
 
 ```userAddress``` - Address of the user.
-```handleName``` - Handlename to be set.
+```inbloxId``` - Inblox ID to be set.
 ```from``` - Address of the registrar.
 ```privateKey``` - Private Key of the registrar.
 
@@ -50,16 +46,16 @@ Initialise the constructor using your Infura secret key or RPC URL like this,
 
 Transaction details.
 
-> Update Handlename
+> Update Inblox ID
 
 ___
 
-* ```updateHandlename()```
+* ```updateInbloxId()```
 
 #### Inputs
 
 ```userAddress``` - Address of the user.
-```newHandleName``` - New Handlename to be set.
+```newInbloxId``` - New Inblox ID to be set.
 ```from``` - Address of the registrar.
 ```privateKey``` - Private Key of the registrar.
 
@@ -67,11 +63,11 @@ ___
 
 Transaction details.
 
-> Check if Handlename registration is paused,
+> Check if Inblox ID registration is paused,
 
 ---
 
-* ```isHandlenameRegistrationPaused()```
+* ```isRegistrationPaused()```
 
 #### Inputs
 
@@ -79,62 +75,62 @@ No inputs.
 
 #### Output
 
-If registration is paused - ```Handlename registration is paused.```
-If registration is not paused - ```Handlename registration is not paused.```
+If registration is paused - ```true```
+If registration is not paused - ```false```
 
-> Handlename update count
+> Inblox ID update count
 
 ---
 
-* ```handlenameUpdateCount()```
+* ```getUpdateCount()```
 
 #### Input
 
-```address``` - Address of the user to check the handlename update count.
+```address``` - Address of the user to check the Inblox ID update count.
 
 #### Output
 
 update count
 If invalid or wrong address - ```Invalid address.```
 
-> Retrieve the handlename of a particular address
+> Retrieve the Inblox ID of a particular address
 
 ---
 
-* ```resolveHandleNameFromAddress()```
+* ```getInbloxId()```
 
 #### Input
 
-```userAddress``` - Address of the user to get the handlename.
+```userAddress``` - Address of the user to get the Inblox ID.
 
 #### Output
 
-Handlename of the user
+Inblox ID of the user
 If invalid or wrong address - ```Invalid address.```
 
-> Retrieve the address of a particular handlename
+> Retrieve the address of a particular Inblox ID
 
 ---
 
-* ```resolveAddressFromHandleName()```
+* ```getAddress()```
 
 #### Input
 
-```handlename``` - Handlename of the user to get the address.
+```inbloxId``` - Inblox ID of the user to get the address.
 
 #### Output
 
 Address of the user.
 
-> Get the current handlename registration fees
+> Get the current Inblox ID registration fees
 
 ---
 
-* ```handlenameFees()```
+* ```inbloxIdFees()```
 
 #### Output
 
-Handlename registration fees.
+Inblox ID registration fees.
 
 ## WIP
 
