@@ -4,7 +4,7 @@ const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./config');
 const {
-  INVALID_INBLOXID, INVALID_ADDRESS, HN_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
+  INVALID_INBLOXID, INVALID_ADDRESS, INBLOXID_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
 } = require('./constants/errors');
 
 let web3;
@@ -138,9 +138,9 @@ class InbloxID {
     }
 
     const fees = await this.inbloxIdFees();
-    const isHNValid = await isInbloxIdValid(inbloxId);
+    const isInbloxIDValid = await isInbloxIdValid(inbloxId);
 
-    if (isHNValid === false) {
+    if (isInbloxIDValid === false) {
       return INVALID_INBLOXID;
     }
 
@@ -178,11 +178,11 @@ class InbloxID {
 
     const updateCount = await this.getUpdateCount(userAddress);
     const fees = await this.inbloxIdFees();
-    const isHNValid = await isInbloxIdValid(newInbloxId);
+    const isInbloxIDValid = await isInbloxIdValid(newInbloxId);
 
     if (updateCount >= 2) {
-      return HN_MAX_COUNT;
-    } if (isHNValid === false) {
+      return INBLOXID_MAX_COUNT;
+    } if (isInbloxIDValid === false) {
       return INVALID_INBLOXID;
     }
 
