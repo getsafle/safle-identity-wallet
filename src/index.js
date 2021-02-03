@@ -24,7 +24,7 @@ let web3;
 async function getContractAddress() {
   let network;
 
-  await this.web3.eth.net.getNetworkType().then((e) => network = e);
+  await web3.eth.net.getNetworkType().then((e) => network = e);
 
   if(network === 'main') {
     return { main: MAIN_CONTRACT_MAINNET, storage: STORAGE_CONTRACT_MAINNET }
