@@ -59,10 +59,14 @@ async function sendTransaction(payload) {
       gas: web3.utils.numberToHex(gas),
       gasPrice: web3.utils.numberToHex(gasPrice),
       data: encodedABI,
-      chainId: 3,
     };
+
+    let network;
+
+    await web3.eth.net.getNetworkType().then((e) => network = e);
+
     const pkey = Buffer.from(privateKey, 'hex');
-    const tx = new Tx(rawTx, { chain: 'ropsten', hardfork: 'petersburg' });
+    const tx = new Tx(rawTx, { chain: network });
 
     tx.sign(pkey);
     const stringTx = `0x${tx.serialize().toString('hex')}`;
