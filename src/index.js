@@ -72,7 +72,7 @@ class InbloxID {
 
   //  Get the status of Inblox ID registration
   async isRegistrationPaused() {
-    const isRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();
+    const isRegistrationPaused = await this.MainContract.methods.inbloxIdRegStatus().call();
 
     return isRegistrationPaused;
   }
@@ -80,7 +80,7 @@ class InbloxID {
   //  Get the number of times the user updated their Inblox ID
   async getUpdateCount(address) {
     try {
-      const updateCount = await this.StorageContract.methods.updateCount(address).call();
+      const updateCount = await this.StorageContract.methods.totalInbloxIDCount(address).call();
 
       return updateCount;
     } catch (error) {
@@ -91,7 +91,7 @@ class InbloxID {
   //  Get the Inblox ID from address
   async getInbloxId(userAddress) {
     try {
-      const userInbloxID = await this.StorageContract.methods.resolveHandleName(userAddress).call();
+      const userInbloxID = await this.StorageContract.methods.resolveUserAddress(userAddress).call();
 
       return userInbloxID;
     } catch (error) {
@@ -101,14 +101,14 @@ class InbloxID {
 
   //  Resolve the user's address from their Inblox ID
   async getAddress(inbloxID) {
-    const userAddress = await this.StorageContract.methods.resolveHandleNameString(inbloxID).call();
+    const userAddress = await this.StorageContract.methods.resolveInbloxId(inbloxID).call();
 
     return userAddress;
   }
 
   //  Get the Inblox ID registration fees
   async inbloxIdFees() {
-    const inbloxIdFees = await this.MainContract.methods.userHandleNameRegFees().call();
+    const inbloxIdFees = await this.MainContract.methods.inbloxIdFees().call();
 
     return inbloxIdFees;
   }
@@ -145,7 +145,7 @@ class InbloxID {
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.addHandleName(userAddress, inbloxId).encodeABI();
+      const encodedABI = await this.MainContract.methods.registerInbloxId(userAddress, inbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -187,7 +187,7 @@ class InbloxID {
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.updateHandleNameOfUser(userAddress, newInbloxId).encodeABI();
+      const encodedABI = await this.MainContract.methods.updateInbloxId(userAddress, newInbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
