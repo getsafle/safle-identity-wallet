@@ -2,12 +2,43 @@ const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
-const { MAIN_CONTRACT_ADDRESS, STORAGE_CONTRACT_ADDRESS } = require('./config');
+const {
+  MAIN_CONTRACT_MAINNET,
+  MAIN_CONTRACT_ROPSTEN,
+  MAIN_CONTRACT_RINKEBY,
+  MAIN_CONTRACT_KOVAN,
+  MAIN_CONTRACT_GOERLI,
+  STORAGE_CONTRACT_MAINNET,
+  STORAGE_CONTRACT_ROPSTEN,
+  STORAGE_CONTRACT_RINKEBY,
+  STORAGE_CONTRACT_KOVAN,
+  STORAGE_CONTRACT_GOERLI
+} = require('./config');
 const {
   INVALID_INBLOXID, INVALID_ADDRESS, INBLOXID_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
 } = require('./constants/errors');
 
 let web3;
+
+//  Get the contract addresses for the current Ethereum network
+async function getContractAddress() {
+  let network;
+
+  await this.web3.eth.net.getNetworkType().then((e) => network = e);
+
+  if(network === 'main') {
+    return { main: MAIN_CONTRACT_MAINNET, storage: STORAGE_CONTRACT_MAINNET }
+  } else if(network === 'ropsten') {
+    return { main: MAIN_CONTRACT_ROPSTEN, storage: STORAGE_CONTRACT_ROPSTEN }
+  } else if(network === 'rinkeby') {
+    return { main: MAIN_CONTRACT_RINKEBY, storage: STORAGE_CONTRACT_RINKEBY }
+  } else if(network === 'kovan') {
+    return { main: MAIN_CONTRACT_KOVAN, storage: STORAGE_CONTRACT_KOVAN }
+  } else if(network === 'goerli') {
+    return { main: MAIN_CONTRACT_GOERLI, storage: STORAGE_CONTRACT_GOERLI }
+  }
+
+}
 
 // POST method reusable code
 async function sendTransaction(payload) {
@@ -56,23 +87,19 @@ async function isInbloxIdValid(inbloxId) {
 }
 
 class InbloxID {
-  constructor({ infuraKey, rpcUrl }) {
-    if (!rpcUrl) {
-      web3 = new Web3(new Web3.providers.HttpProvider(`https://ropsten.infura.io/v3/${infuraKey}`));
-    } else {
-      web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
-    }
-    this.MainContractAddress = MAIN_CONTRACT_ADDRESS;
+  constructor({ rpcUrl }) {
+    web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
     this.MainContractABI = mainContractABI;
-    this.StorageContractAddress = STORAGE_CONTRACT_ADDRESS;
     this.StorageContractABI = storageContractABI;
-    this.MainContract = new web3.eth.Contract(this.MainContractABI, this.MainContractAddress);
-    this.StorageContract = new web3.eth.Contract(this.StorageContractABI, this.StorageContractAddress);
   }
 
   //  Get the status of Inblox ID registration
   async isRegistrationPaused() {
-    const isRegistrationPaused = await this.MainContract.methods.isHandlenameRegistrationPaused().call();
+    const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+
+    const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
+
+    const isRegistrationPaused = await MainContract.methods.inbloxIdRegStatus().call();
 
     return isRegistrationPaused;
   }
@@ -80,7 +107,11 @@ class InbloxID {
   //  Get the number of times the user updated their Inblox ID
   async getUpdateCount(address) {
     try {
-      const updateCount = await this.StorageContract.methods.updateCount(address).call();
+      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+
+      const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+      const updateCount = await StorageContract.methods.totalInbloxIDCount(address).call();
 
       return updateCount;
     } catch (error) {
@@ -91,7 +122,11 @@ class InbloxID {
   //  Get the Inblox ID from address
   async getInbloxId(userAddress) {
     try {
-      const userInbloxID = await this.StorageContract.methods.resolveHandleName(userAddress).call();
+      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+
+      const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+      const userInbloxID = await StorageContract.methods.resolveUserAddress(userAddress).call();
 
       return userInbloxID;
     } catch (error) {
@@ -101,14 +136,22 @@ class InbloxID {
 
   //  Resolve the user's address from their Inblox ID
   async getAddress(inbloxID) {
-    const userAddress = await this.StorageContract.methods.resolveHandleNameString(inbloxID).call();
+    const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+
+    const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+    const userAddress = await StorageContract.methods.resolveInbloxId(inbloxID).call();
 
     return userAddress;
   }
 
   //  Get the Inblox ID registration fees
   async inbloxIdFees() {
-    const inbloxIdFees = await this.MainContract.methods.userHandleNameRegFees().call();
+    const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+
+    const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
+
+    const inbloxIdFees = await MainContract.methods.inbloxIdFees().call();
 
     return inbloxIdFees;
   }
@@ -145,7 +188,11 @@ class InbloxID {
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.addHandleName(userAddress, inbloxId).encodeABI();
+      const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+
+      const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
+
+      const encodedABI = await MainContract.methods.registerInbloxId(userAddress, inbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -187,7 +234,11 @@ class InbloxID {
     }
 
     try {
-      const encodedABI = await this.MainContract.methods.updateHandleNameOfUser(userAddress, newInbloxId).encodeABI();
+      const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+
+      const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
+
+      const encodedABI = await MainContract.methods.updateInbloxId(userAddress, newInbloxId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
