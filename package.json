@@ -1,6 +1,6 @@
 {
   "name": "@inbloxme/inbloxme-identity-wallet",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Package for interacting with the Inblox ID Smart Contracts.",
   "main": "src/index.js",
   "scripts": {
