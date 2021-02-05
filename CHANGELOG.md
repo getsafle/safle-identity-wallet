@@ -27,3 +27,9 @@
 
 ##### Updated naming convention from Inblox Handle Name to InbloxID
 
+#### 1.0.6 (2021-01-04)
+
+##### Optimized contract updates
+
+*Created a method to get the contract addresses according to the web3 network
+*Updated the function names according to the latest contracts
