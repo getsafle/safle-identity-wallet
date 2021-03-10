@@ -6,8 +6,7 @@
   "scripts": {
     "test": "npm-run-all --silent test-*",
     "test-audit": "npm audit ---audit-level=critical",
-    "test-lint": "eslint ./src/**/*.js",
-    "start": "node src/index.js"
+    "test-lint": "eslint ./src/**/*.js"
   },
   "author": "",
   "license": "ISC",

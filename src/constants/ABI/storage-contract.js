@@ -87,7 +87,7 @@ const storageContractABI = [
 			}
 		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -129,7 +129,7 @@ const storageContractABI = [
 			}
 		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -414,7 +414,7 @@ const storageContractABI = [
 			}
 		],
 		"payable": false,
-		"stateMutability": "view",
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{

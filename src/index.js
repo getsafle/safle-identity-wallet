@@ -8,13 +8,11 @@ const {
   MAIN_CONTRACT_RINKEBY,
   MAIN_CONTRACT_KOVAN,
   MAIN_CONTRACT_GOERLI,
-  MAIN_CONTRACT_MATIC_TEST,
   STORAGE_CONTRACT_MAINNET,
   STORAGE_CONTRACT_ROPSTEN,
   STORAGE_CONTRACT_RINKEBY,
   STORAGE_CONTRACT_KOVAN,
-  STORAGE_CONTRACT_GOERLI,
-  STORAGE_CONTRACT_MATIC_TEST,
+  STORAGE_CONTRACT_GOERLI
 } = require('./config');
 const {
   INVALID_INBLOXID, INVALID_ADDRESS, INBLOXID_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
@@ -38,8 +36,6 @@ async function getContractAddress() {
     return { main: MAIN_CONTRACT_KOVAN, storage: STORAGE_CONTRACT_KOVAN }
   } else if(network === 'goerli') {
     return { main: MAIN_CONTRACT_GOERLI, storage: STORAGE_CONTRACT_GOERLI }
-  } else if(network === 'private') {
-    return { main: MAIN_CONTRACT_MATIC_TEST, storage: STORAGE_CONTRACT_MATIC_TEST }
   }
 
 }
@@ -261,21 +257,3 @@ class InbloxID {
 }
 
 module.exports = { InbloxID };
-
-async function test() {
-  const ID = new InbloxID({ rpcUrl: 'https://rpc-mumbai.matic.today' });
-
-  const fees = await ID.inbloxIdFees();
-
-  console.log("Fees : ", fees);
-
-  const address = await ID.getAddress("safle");
-
-  console.log("Address : ", address);
-
-  const inbloxId = await ID.getInbloxId("0x6323422F96C740A704e44a3cE96b5F89417De897");
-
-  console.log("InbloxId : ", inbloxId)
-}
-
-test()
