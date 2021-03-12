@@ -3,41 +3,20 @@ const Tx = require('ethereumjs-tx').Transaction;
 const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const {
-  MAIN_CONTRACT_MAINNET,
-  MAIN_CONTRACT_ROPSTEN,
-  MAIN_CONTRACT_RINKEBY,
-  MAIN_CONTRACT_KOVAN,
-  MAIN_CONTRACT_GOERLI,
-  STORAGE_CONTRACT_MAINNET,
-  STORAGE_CONTRACT_ROPSTEN,
-  STORAGE_CONTRACT_RINKEBY,
-  STORAGE_CONTRACT_KOVAN,
-  STORAGE_CONTRACT_GOERLI
+  MAIN_CONTRACT_MATIC_TESTNET,
+  STORAGE_CONTRACT_MATIC_TESTNET,
+  CHAIN_ID_MATIC_TESTNET,
+  MATIC_TESTNET_RPC_URL,
 } = require('./config');
 const {
-  INVALID_INBLOXID, INVALID_ADDRESS, INBLOXID_MAX_COUNT, INVALID_INPUT, INBLOXID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, INBLOXID_ALREADY_TAKEN,
+  INVALID_SAFLEID, INVALID_ADDRESS, SAFLEID_MAX_COUNT, INVALID_INPUT, SAFLEID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, SAFLEID_ALREADY_TAKEN,
 } = require('./constants/errors');
 
 let web3;
 
 //  Get the contract addresses for the current Ethereum network
 async function getContractAddress() {
-  let network;
-
-  await web3.eth.net.getNetworkType().then((e) => network = e);
-
-  if(network === 'main') {
-    return { main: MAIN_CONTRACT_MAINNET, storage: STORAGE_CONTRACT_MAINNET }
-  } else if(network === 'ropsten') {
-    return { main: MAIN_CONTRACT_ROPSTEN, storage: STORAGE_CONTRACT_ROPSTEN }
-  } else if(network === 'rinkeby') {
-    return { main: MAIN_CONTRACT_RINKEBY, storage: STORAGE_CONTRACT_RINKEBY }
-  } else if(network === 'kovan') {
-    return { main: MAIN_CONTRACT_KOVAN, storage: STORAGE_CONTRACT_KOVAN }
-  } else if(network === 'goerli') {
-    return { main: MAIN_CONTRACT_GOERLI, storage: STORAGE_CONTRACT_GOERLI }
-  }
-
+  return { main: MAIN_CONTRACT_MATIC_TESTNET, storage: STORAGE_CONTRACT_MATIC_TESTNET };
 }
 
 // POST method reusable code
@@ -59,14 +38,11 @@ async function sendTransaction(payload) {
       gas: web3.utils.numberToHex(gas),
       gasPrice: web3.utils.numberToHex(gasPrice),
       data: encodedABI,
+      chainId: CHAIN_ID_MATIC_TESTNET,
     };
 
-    let network;
-
-    await web3.eth.net.getNetworkType().then((e) => network = e);
-
     const pkey = Buffer.from(privateKey, 'hex');
-    const tx = new Tx(rawTx, { chain: network });
+    const tx = new Tx(rawTx);
 
     tx.sign(pkey);
     const stringTx = `0x${tx.serialize().toString('hex')}`;
@@ -75,47 +51,47 @@ async function sendTransaction(payload) {
 
     return response;
   } catch (error) {
-    return { error: [ { name: 'address & inblox id', message: error.message } ] };
+    return { error: [ { name: 'address & safle id', message: error.message } ] };
   }
 }
 
-//  Function to check Inblox ID validity
-async function isInbloxIdValid(inbloxId) {
-  const inbloxIdLength = inbloxId.length;
+//  Function to check Safle ID validity
+async function isSafleIdValid(safleId) {
+  const safleIdLength = safleId.length;
 
-  if (inbloxIdLength >= 4 && inbloxIdLength <= 16 && inbloxIdLength.match(/^[0-9a-z]+$/i) !== null) {
+  if (safleIdLength >= 4 && safleIdLength <= 16 && safleIdLength.match(/^[0-9a-z]+$/i) !== null) {
     return true;
   }
 
   return false;
 }
 
-class InbloxID {
-  constructor({ rpcUrl }) {
-    web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
+class SafleID {
+  constructor() {
+    web3 = new Web3(new Web3.providers.HttpProvider(MATIC_TESTNET_RPC_URL));
     this.MainContractABI = mainContractABI;
     this.StorageContractABI = storageContractABI;
   }
 
-  //  Get the status of Inblox ID registration
+  //  Get the status of Safle ID registration
   async isRegistrationPaused() {
     const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
 
     const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
-    const isRegistrationPaused = await MainContract.methods.inbloxIdRegStatus().call();
+    const isRegistrationPaused = await MainContract.methods.safleIdRegStatus().call();
 
     return isRegistrationPaused;
   }
 
-  //  Get the number of times the user updated their Inblox ID
+  //  Get the number of times the user updated their Safle ID
   async getUpdateCount(address) {
     try {
       const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
 
       const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
-      const updateCount = await StorageContract.methods.totalInbloxIDCount(address).call();
+      const updateCount = await StorageContract.methods.totalSafleIDCount(address).call();
 
       return updateCount;
     } catch (error) {
@@ -123,72 +99,72 @@ class InbloxID {
     }
   }
 
-  //  Get the Inblox ID from address
-  async getInbloxId(userAddress) {
+  //  Get the Safle ID from address
+  async getSafleId(userAddress) {
     try {
       const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
 
       const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
-      const userInbloxID = await StorageContract.methods.resolveUserAddress(userAddress).call();
+      const userSafleID = await StorageContract.methods.resolveUserAddress(userAddress).call();
 
-      return userInbloxID;
+      return userSafleID;
     } catch (error) {
       return INVALID_ADDRESS;
     }
   }
 
-  //  Resolve the user's address from their Inblox ID
-  async getAddress(inbloxID) {
+  //  Resolve the user's address from their Safle ID
+  async getAddress(safleID) {
     const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
 
     const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
-    const userAddress = await StorageContract.methods.resolveInbloxId(inbloxID).call();
+    const userAddress = await StorageContract.methods.resolveSafleId(safleID).call();
 
     return userAddress;
   }
 
-  //  Get the Inblox ID registration fees
-  async inbloxIdFees() {
+  //  Get the Safle ID registration fees
+  async safleIdFees() {
     const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
 
     const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
-    const inbloxIdFees = await MainContract.methods.inbloxIdFees().call();
+    const safleIdFees = await MainContract.methods.safleIdFees().call();
 
-    return inbloxIdFees;
+    return safleIdFees;
   }
 
-  //  Register a new user with Inblox ID
-  async setInbloxId(payload) {
+  //  Register a new user with Safle ID
+  async setSafleId(payload) {
     const {
-      userAddress, inbloxId, from, privateKey,
+      userAddress, safleId, from, privateKey,
     } = payload;
 
-    const isInbloxIDRegOnHold = await this.isRegistrationPaused();
+    const isSafleIDRegOnHold = await this.isRegistrationPaused();
 
-    if (isInbloxIDRegOnHold) {
-      return INBLOXID_REG_ON_HOLD;
+    if (isSafleIDRegOnHold) {
+      return SAFLEID_REG_ON_HOLD;
     }
 
-    const isAddressTaken = await this.getInbloxId(userAddress);
+    const isAddressTaken = await this.getSafleId(userAddress);
 
     if (isAddressTaken !== 'Invalid address.') {
       return ADDRESS_ALREADY_TAKEN;
     }
 
-    const addressOfInbloxId = await this.getAddress(inbloxId);
+    const addressOfSafleId = await this.getAddress(safleId);
 
-    if (addressOfInbloxId !== '0x0000000000000000000000000000000000000000') {
-      return INBLOXID_ALREADY_TAKEN;
+    if (addressOfSafleId !== '0x0000000000000000000000000000000000000000') {
+      return SAFLEID_ALREADY_TAKEN;
     }
 
-    const fees = await this.inbloxIdFees();
-    const isInbloxIDValid = await isInbloxIdValid(inbloxId);
+    const fees = await this.safleIdFees();
+    const isSafleIDValid = await isSafleIdValid(safleId);
 
-    if (isInbloxIDValid === false) {
-      return INVALID_INBLOXID;
+    if (isSafleIDValid === false) {
+      return INVALID_SAFLEID;
     }
 
     try {
@@ -196,7 +172,7 @@ class InbloxID {
 
       const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
-      const encodedABI = await MainContract.methods.registerInbloxId(userAddress, inbloxId).encodeABI();
+      const encodedABI = await MainContract.methods.registerSafleId(userAddress, safleId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -209,32 +185,32 @@ class InbloxID {
     }
   }
 
-  //  Update Inblox ID of the user
-  async updateInbloxId(payload) {
+  //  Update Safle ID of the user
+  async updateSafleId(payload) {
     const {
-      userAddress, newInbloxId, from, privateKey,
+      userAddress, newSafleId, from, privateKey,
     } = payload;
 
-    const isInbloxIdRegOnHold = await this.isRegistrationPaused();
+    const isSafleIdRegOnHold = await this.isRegistrationPaused();
 
-    if (isInbloxIdRegOnHold) {
-      return INBLOXID_REG_ON_HOLD;
+    if (isSafleIdRegOnHold) {
+      return SAFLEID_REG_ON_HOLD;
     }
 
-    const addressOfInbloxId = await this.getAddress(newInbloxId);
+    const addressOfSafleId = await this.getAddress(newSafleId);
 
-    if (addressOfInbloxId !== '0x0000000000000000000000000000000000000000') {
-      return INBLOXID_ALREADY_TAKEN;
+    if (addressOfSafleId !== '0x0000000000000000000000000000000000000000') {
+      return SAFLEID_ALREADY_TAKEN;
     }
 
     const updateCount = await this.getUpdateCount(userAddress);
-    const fees = await this.inbloxIdFees();
-    const isInbloxIDValid = await isInbloxIdValid(newInbloxId);
+    const fees = await this.safleIdFees();
+    const isSafleIDValid = await isSafleIdValid(newSafleId);
 
     if (updateCount >= 2) {
-      return INBLOXID_MAX_COUNT;
-    } if (isInbloxIDValid === false) {
-      return INVALID_INBLOXID;
+      return SAFLEID_MAX_COUNT;
+    } if (isSafleIDValid === false) {
+      return INVALID_SAFLEID;
     }
 
     try {
@@ -242,7 +218,7 @@ class InbloxID {
 
       const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
-      const encodedABI = await MainContract.methods.updateInbloxId(userAddress, newInbloxId).encodeABI();
+      const encodedABI = await MainContract.methods.updateSafleId(userAddress, newSafleId).encodeABI();
       const gas = 4000000;
 
       const response = await sendTransaction({
@@ -256,4 +232,4 @@ class InbloxID {
   }
 }
 
-module.exports = { InbloxID };
+module.exports = { SafleID };

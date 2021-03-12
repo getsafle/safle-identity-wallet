@@ -1,9 +1,9 @@
 module.exports = {
-  INVALID_INBLOXID: 'The Inblox ID has to be alphanumeric and length should be between 4-16.',
+  INVALID_SAFLEID: 'The Safle ID has to be alphanumeric and length should be between 4-16.',
   INVALID_ADDRESS: 'Invalid address.',
-  INBLOXID_MAX_COUNT: 'Inblox ID cannot be updated more than twice.',
+  SAFLEID_MAX_COUNT: 'Safle ID cannot be updated more than twice.',
   INVALID_INPUT: 'Please check the input.',
-  INBLOXID_REG_ON_HOLD: 'Inblox ID registration is currently on hold',
-  ADDRESS_ALREADY_TAKEN: 'This address is already mapped to another Inblox ID',
-  INBLOXID_ALREADY_TAKEN: 'This Inblox ID is already mapped to another address',
+  SAFLEID_REG_ON_HOLD: 'Safle ID registration is currently on hold',
+  ADDRESS_ALREADY_TAKEN: 'This address is already mapped to another Safle ID',
+  SAFLEID_ALREADY_TAKEN: 'This Safle ID is already mapped to another address',
 };
