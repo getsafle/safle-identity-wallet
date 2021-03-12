@@ -6,4 +6,5 @@ module.exports = {
   SAFLEID_REG_ON_HOLD: 'Safle ID registration is currently on hold',
   ADDRESS_ALREADY_TAKEN: 'This address is already mapped to another Safle ID',
   SAFLEID_ALREADY_TAKEN: 'This Safle ID is already mapped to another address',
+  SAFLE_ID_NOT_REGISTERED: 'This SafleID is not registered.',
 };

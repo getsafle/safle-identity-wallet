@@ -9,7 +9,7 @@ const {
   MATIC_TESTNET_RPC_URL,
 } = require('./config');
 const {
-  INVALID_SAFLEID, INVALID_ADDRESS, SAFLEID_MAX_COUNT, INVALID_INPUT, SAFLEID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, SAFLEID_ALREADY_TAKEN,
+  INVALID_SAFLEID, INVALID_ADDRESS, SAFLEID_MAX_COUNT, INVALID_INPUT, SAFLEID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, SAFLEID_ALREADY_TAKEN, SAFLE_ID_NOT_REGISTERED,
 } = require('./constants/errors');
 
 let web3;
@@ -116,13 +116,17 @@ class SafleID {
 
   //  Resolve the user's address from their Safle ID
   async getAddress(safleID) {
-    const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+    try {
+      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
 
-    const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+      const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
-    const userAddress = await StorageContract.methods.resolveSafleId(safleID).call();
+      const userAddress = await StorageContract.methods.resolveSafleId(safleID).call();
 
-    return userAddress;
+      return userAddress;
+    } catch (error) {
+      return SAFLE_ID_NOT_REGISTERED;
+    }
   }
 
   //  Get the Safle ID registration fees
