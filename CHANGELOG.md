@@ -33,3 +33,12 @@
 
 *Created a method to get the contract addresses according to the web3 network
 *Updated the function names according to the latest contracts
+
+#### 1.0.7 (2021-03-12)
+
+##### Rebranding from Inblox to Safle
+
+*Updated all the variable and function names from Inblox to Safle.
+*Updated the contract ABIs.
+*Updated the contrat addresses.
+*Removed the user input for RPC URL and set a custom RPC URL for MATIC testnet.
