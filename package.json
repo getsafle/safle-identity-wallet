@@ -1,7 +1,7 @@
 {
-  "name": "@inbloxme/inbloxme-identity-wallet",
-  "version": "1.0.8",
-  "description": "Package for interacting with the Inblox ID Smart Contracts.",
+  "name": "@getsafle/safle-identity-wallet",
+  "version": "1.0.0",
+  "description": "Package for interacting with the SafleId Smart Contracts.",
   "main": "src/index.js",
   "scripts": {
     "test": "npm-run-all --silent test-*",
