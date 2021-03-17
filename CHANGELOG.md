@@ -42,3 +42,9 @@
 *Updated the contract ABIs.
 *Updated the contrat addresses.
 *Removed the user input for RPC URL and set a custom RPC URL for MATIC testnet.
+
+#### 1.0.8 (2021-03-17)
+
+##### MATIC network selection through user input in the constructor
+
+*Added a constructor parameter for network selection. The network details will be fetched and set based on the user env input.
