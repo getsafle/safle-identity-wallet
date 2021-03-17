@@ -4,31 +4,57 @@ const { mainContractABI } = require('./constants/ABI/main-contract');
 const { storageContractABI } = require('./constants/ABI/storage-contract');
 const {
   MAIN_CONTRACT_MATIC_TESTNET,
+  MAIN_CONTRACT_MATIC_MAINNET,
   STORAGE_CONTRACT_MATIC_TESTNET,
+  STORAGE_CONTRACT_MATIC_MAINNET,
   CHAIN_ID_MATIC_TESTNET,
+  CHAIN_ID_MATIC_MAINNET,
   MATIC_TESTNET_RPC_URL,
+  MATIC_MAINNET_RPC_URL,
 } = require('./config');
 const {
-  INVALID_SAFLEID, INVALID_ADDRESS, SAFLEID_MAX_COUNT, INVALID_INPUT, SAFLEID_REG_ON_HOLD, ADDRESS_ALREADY_TAKEN, SAFLEID_ALREADY_TAKEN, SAFLE_ID_NOT_REGISTERED,
+  INVALID_SAFLEID,
+  INVALID_ADDRESS,
+  SAFLEID_MAX_COUNT,
+  INVALID_INPUT,
+  SAFLEID_REG_ON_HOLD,
+  ADDRESS_ALREADY_TAKEN,
+  SAFLEID_ALREADY_TAKEN,
+  SAFLE_ID_NOT_REGISTERED,
 } = require('./constants/errors');
 
 let web3;
 
 //  Get the contract addresses for the current Ethereum network
-async function getContractAddress() {
-  return { main: MAIN_CONTRACT_MATIC_TESTNET, storage: STORAGE_CONTRACT_MATIC_TESTNET };
+async function getContractAddress(env) {
+  if (env === 'testnet') {
+    return {
+      main: MAIN_CONTRACT_MATIC_TESTNET, storage: STORAGE_CONTRACT_MATIC_TESTNET, chainId: CHAIN_ID_MATIC_TESTNET, rpcUrl: MATIC_TESTNET_RPC_URL,
+    };
+  } if (env === 'mainnet') {
+    return {
+      main: MAIN_CONTRACT_MATIC_MAINNET, storage: STORAGE_CONTRACT_MATIC_MAINNET, chainId: CHAIN_ID_MATIC_MAINNET, rpcUrl: MATIC_MAINNET_RPC_URL,
+    };
+  }
+
+  return { error: 'Invalid env input.' };
 }
 
 // POST method reusable code
 async function sendTransaction(payload) {
   try {
     const {
-      encodedABI, gas, from, to, privateKey, value,
+      encodedABI, gas, from, to, privateKey, value, env,
     } = payload;
 
     const gasPrice = await web3.eth.getGasPrice();
     const count = await web3.eth.getTransactionCount(from);
     const nonce = await web3.utils.toHex(count);
+    const { chainId: CHAIN_ID, error } = await getContractAddress(env);
+
+    if (error) {
+      return { error };
+    }
 
     const rawTx = {
       from,
@@ -38,7 +64,7 @@ async function sendTransaction(payload) {
       gas: web3.utils.numberToHex(gas),
       gasPrice: web3.utils.numberToHex(gasPrice),
       data: encodedABI,
-      chainId: CHAIN_ID_MATIC_TESTNET,
+      chainId: CHAIN_ID,
     };
 
     const pkey = Buffer.from(privateKey, 'hex');
@@ -67,15 +93,20 @@ async function isSafleIdValid(safleId) {
 }
 
 class SafleID {
-  constructor() {
-    web3 = new Web3(new Web3.providers.HttpProvider(MATIC_TESTNET_RPC_URL));
+  constructor(env) {
+    web3 = new Web3(new Web3.providers.HttpProvider(env === 'mainnet' ? MATIC_MAINNET_RPC_URL : MATIC_TESTNET_RPC_URL));
     this.MainContractABI = mainContractABI;
     this.StorageContractABI = storageContractABI;
+    this.env = env;
   }
 
   //  Get the status of Safle ID registration
   async isRegistrationPaused() {
-    const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+    const { main: MAIN_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+    if (error) {
+      return { error };
+    }
 
     const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
@@ -87,7 +118,11 @@ class SafleID {
   //  Get the number of times the user updated their Safle ID
   async getUpdateCount(address) {
     try {
-      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+      const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+      if (error) {
+        return { error };
+      }
 
       const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
@@ -102,7 +137,11 @@ class SafleID {
   //  Get the Safle ID from address
   async getSafleId(userAddress) {
     try {
-      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+      const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+      if (error) {
+        return { error };
+      }
 
       const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
@@ -117,7 +156,11 @@ class SafleID {
   //  Resolve the user's address from their Safle ID
   async getAddress(safleID) {
     try {
-      const { storage: STORAGE_CONTRACT_ADDRESS } = await getContractAddress();
+      const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+      if (error) {
+        return { error };
+      }
 
       const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
 
@@ -131,7 +174,11 @@ class SafleID {
 
   //  Get the Safle ID registration fees
   async safleIdFees() {
-    const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+    const { main: MAIN_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+    if (error) {
+      return { error };
+    }
 
     const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
@@ -172,7 +219,11 @@ class SafleID {
     }
 
     try {
-      const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+      const { main: MAIN_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+      if (error) {
+        return { error };
+      }
 
       const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
@@ -180,7 +231,7 @@ class SafleID {
       const gas = 4000000;
 
       const response = await sendTransaction({
-        encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees,
+        encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees, env: this.env,
       });
 
       return response;
@@ -218,7 +269,11 @@ class SafleID {
     }
 
     try {
-      const { main: MAIN_CONTRACT_ADDRESS } = await getContractAddress();
+      const { main: MAIN_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+      if (error) {
+        return { error };
+      }
 
       const MainContract = new web3.eth.Contract(this.MainContractABI, MAIN_CONTRACT_ADDRESS);
 
@@ -226,7 +281,7 @@ class SafleID {
       const gas = 4000000;
 
       const response = await sendTransaction({
-        encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees,
+        encodedABI, gas, from, to: this.MainContractAddress, privateKey, value: fees, env: this.env,
       });
 
       return response;
