@@ -48,3 +48,9 @@
 ##### MATIC network selection through user input in the constructor
 
 *Added a constructor parameter for network selection. The network details will be fetched and set based on the user env input.
+
+#### 1.0.1 (2021-04-16)
+
+##### Updated README
+
+*Updated all the instances of inblox to safle in the README file.

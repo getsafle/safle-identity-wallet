@@ -1,8 +1,8 @@
-# InbloxMe Identity Wallet
+# Safle Identity Wallet
 
-This package is used to interact with Inblox smart contracts. Registered Registrars can use this package to set and update inblox id for the user.
+This package is used to interact with Safle smart contracts. Registered Registrars can use this package to set and update safleId for the user.
 
-Anyone can use this for Inblox Identity Resolution.
+Anyone can use this for SafleId Resolution.
 
 For now the registrar process is manual, if you want to become one, drop us an email or engage on our social media channels. We will be making it democratic and decentralized soon, it's already in the smart contracts [Hint: You can build on it by yourself too!].
 
@@ -14,31 +14,31 @@ For now the registrar process is manual, if you want to become one, drop us an e
 
 Install the package by running the command,
 
-```npm install @inbloxme/inbloxme-identity-wallet```
+```npm install @getsafle/safle-identity-wallet```
 
 Import the package into your project using,
 
-```const inbloxId = require('@inbloxme/inbloxme-identity-wallet').InbloxID;```
+```const safleId = require('@getsafle/safle-identity-wallet').SafleID;```
 
 > Initialising
 
 Initialise the constructor using your Infura secret key or RPC URL like this,
 
-```const inbloxid = new inbloxId({ infuraKey, rpcUrl });```
+```const safle = new safleId(env);```
 
 
 ### List of all functions
 
-> Set Inblox ID
+> Set SafleId
 
 ---
 
-* ```setInbloxId()```
+* ```setSafleId()```
 
 #### Inputs
 
 ```userAddress``` - Address of the user.
-```inbloxId``` - Inblox ID to be set.
+```safleId``` - SafleId to be set.
 ```from``` - Address of the registrar.
 ```privateKey``` - Private Key of the registrar.
 
@@ -46,16 +46,16 @@ Initialise the constructor using your Infura secret key or RPC URL like this,
 
 Transaction details.
 
-> Update Inblox ID
+> Update SafleId
 
 ___
 
-* ```updateInbloxId()```
+* ```updateSafleId()```
 
 #### Inputs
 
 ```userAddress``` - Address of the user.
-```newInbloxId``` - New Inblox ID to be set.
+```newSafleId``` - New SafleId to be set.
 ```from``` - Address of the registrar.
 ```privateKey``` - Private Key of the registrar.
 
@@ -63,7 +63,7 @@ ___
 
 Transaction details.
 
-> Check if Inblox ID registration is paused,
+> Check if SafleId registration is paused,
 
 ---
 
@@ -78,7 +78,7 @@ No inputs.
 If registration is paused - ```true```
 If registration is not paused - ```false```
 
-> Inblox ID update count
+> SafleId update count
 
 ---
 
@@ -86,29 +86,29 @@ If registration is not paused - ```false```
 
 #### Input
 
-```address``` - Address of the user to check the Inblox ID update count.
+```address``` - Address of the user to check the SafleId update count.
 
 #### Output
 
 update count
 If invalid or wrong address - ```Invalid address.```
 
-> Retrieve the Inblox ID of a particular address
+> Retrieve the SafleId of a particular address
 
 ---
 
-* ```getInbloxId()```
+* ```getSafleId()```
 
 #### Input
 
-```userAddress``` - Address of the user to get the Inblox ID.
+```userAddress``` - Address of the user to get the SafleId.
 
 #### Output
 
-Inblox ID of the user
+SafleId of the user
 If invalid or wrong address - ```Invalid address.```
 
-> Retrieve the address of a particular Inblox ID
+> Retrieve the address of a particular SafleId
 
 ---
 
@@ -116,21 +116,21 @@ If invalid or wrong address - ```Invalid address.```
 
 #### Input
 
-```inbloxId``` - Inblox ID of the user to get the address.
+```safleId``` - SafleId of the user to get the address.
 
 #### Output
 
 Address of the user.
 
-> Get the current Inblox ID registration fees
+> Get the current SafleId registration fees
 
 ---
 
-* ```inbloxIdFees()```
+* ```safleIdFees()```
 
 #### Output
 
-Inblox ID registration fees.
+SafleId registration fees.
 
 ## WIP
 
@@ -138,4 +138,4 @@ Want to contribute, we would :heart: that!
 
 We are a Global :earth_asia::earth_africa::earth_americas: team! :muscle:
 
-Write to dev@inblox.me, or follow us on twitter, [https://twitter.com/inblox_me](https://twitter.com/inblox_me)
+Write to dev@getsafle.com, or follow us on twitter, [https://twitter.com/getsafle](https://twitter.com/getsafle)
