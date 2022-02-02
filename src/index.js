@@ -192,12 +192,50 @@ class SafleID {
     try {
       const oldSafleId = await StorageContract.methods.resolveOldSafleIdFromAddress(address, index).call();
 
-      const safleId = web3.utils.hexToUtf8(oldSafleId)
-  
+      const safleId = web3.utils.hexToUtf8(oldSafleId);
+
       return safleId;
     } catch (err) {
       return errorMessage.NO_SAFLEID;
     }
+  }
+
+  // resolve safleId from coinAddress
+  async coinAddressToSafleId(coinAddress) {
+    const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+    if (error) {
+      return { error };
+    }
+
+    const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+    const safleId = await StorageContract.methods.coinAddressToId(coinAddress).call();
+
+    if (safleId !== '') {
+      return safleId;
+    }
+
+    return errorMessage.COIN_ADDRESS_NOT_REGISTERED;
+  }
+
+  // resolve coinAddress from safleId and chainId
+  async safleIdToCoinAddress(safleId, chainId) {
+    const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+    if (error) {
+      return { error };
+    }
+
+    const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+    const coinAddress = await StorageContract.methods.idToCoinAddress(safleId, chainId + 1).call();
+
+    if (coinAddress !== '') {
+      return coinAddress;
+    }
+
+    return errorMessage.NO_COIN_ADDRESS;
   }
 
   //  Register a new user with Safle ID

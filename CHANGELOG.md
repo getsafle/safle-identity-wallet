@@ -60,3 +60,10 @@
 ##### Resolve old SafleId
 
 *Created a method to resolve the old safleId of a user.
+
+#### 1.2.1 (2022-02-02)
+
+##### Resolve coin address
+
+*Added method to resolve safleId from coin address.
+*Added method to coin address from safleId and chainId.
