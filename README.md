@@ -147,6 +147,35 @@ SafleId registration fees.
 
 Old safleId of the user at that index.
 
+> Resolve safleId from coin address
+
+---
+
+* ```coinAddressToSafleId()```
+
+#### Input
+
+```coinAddress``` - Coin address of the user.
+
+#### Output
+
+safleId mapped to that coin address
+
+> Resolve coin address from safleId and chainId
+
+---
+
+* ```safleIdToCoinAddress()```
+
+#### Input
+
+```safleId``` - SafleId of the user.
+```chainId``` - ChainId of the chain for which the address has to be resolved.
+
+#### Output
+
+Coin address for that particular safleId and chainId.
+
 ## WIP
 
 Want to contribute, we would :heart: that!
