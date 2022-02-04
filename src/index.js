@@ -12,16 +12,8 @@ const {
   MATIC_TESTNET_RPC_URL,
   MATIC_MAINNET_RPC_URL,
 } = require('./config');
-const {
-  INVALID_SAFLEID,
-  INVALID_ADDRESS,
-  SAFLEID_MAX_COUNT,
-  INVALID_INPUT,
-  SAFLEID_REG_ON_HOLD,
-  ADDRESS_ALREADY_TAKEN,
-  SAFLEID_ALREADY_TAKEN,
-  SAFLE_ID_NOT_REGISTERED,
-} = require('./constants/errors');
+
+const errorMessage = require('./constants/errors');
 
 let web3;
 
@@ -37,7 +29,7 @@ async function getContractAddress(env) {
     };
   }
 
-  return { error: 'Invalid env input.' };
+  return { error: errorMessage.INVALID_ENV_INPUT };
 }
 
 // POST method reusable code
@@ -130,7 +122,7 @@ class SafleID {
 
       return updateCount;
     } catch (error) {
-      return INVALID_ADDRESS;
+      return errorMessage.INVALID_ADDRESS;
     }
   }
 
@@ -149,7 +141,7 @@ class SafleID {
 
       return userSafleID;
     } catch (error) {
-      return INVALID_ADDRESS;
+      return errorMessage.INVALID_ADDRESS;
     }
   }
 
@@ -168,7 +160,7 @@ class SafleID {
 
       return userAddress;
     } catch (error) {
-      return SAFLE_ID_NOT_REGISTERED;
+      return errorMessage.SAFLE_ID_NOT_REGISTERED;
     }
   }
 
@@ -187,6 +179,27 @@ class SafleID {
     return safleIdFees;
   }
 
+  //  Resolve old safleIds
+  async resolveOldSafleId(address, index) {
+    const { storage: STORAGE_CONTRACT_ADDRESS, error } = await getContractAddress(this.env);
+
+    if (error) {
+      return { error };
+    }
+
+    const StorageContract = new web3.eth.Contract(this.StorageContractABI, STORAGE_CONTRACT_ADDRESS);
+
+    try {
+      const oldSafleId = await StorageContract.methods.resolveOldSafleIdFromAddress(address, index).call();
+
+      const safleId = web3.utils.hexToUtf8(oldSafleId)
+  
+      return safleId;
+    } catch (err) {
+      return errorMessage.NO_SAFLEID;
+    }
+  }
+
   //  Register a new user with Safle ID
   async setSafleId(payload) {
     const {
@@ -196,26 +209,26 @@ class SafleID {
     const isSafleIDRegOnHold = await this.isRegistrationPaused();
 
     if (isSafleIDRegOnHold) {
-      return SAFLEID_REG_ON_HOLD;
+      return errorMessage.SAFLEID_REG_ON_HOLD;
     }
 
     const isAddressTaken = await this.getSafleId(userAddress);
 
     if (isAddressTaken !== 'Invalid address.') {
-      return ADDRESS_ALREADY_TAKEN;
+      return errorMessage.ADDRESS_ALREADY_TAKEN;
     }
 
     const addressOfSafleId = await this.getAddress(safleId);
 
     if (addressOfSafleId !== '0x0000000000000000000000000000000000000000') {
-      return SAFLEID_ALREADY_TAKEN;
+      return errorMessage.SAFLEID_ALREADY_TAKEN;
     }
 
     const fees = await this.safleIdFees();
     const isSafleIDValid = await isSafleIdValid(safleId);
 
     if (isSafleIDValid === false) {
-      return INVALID_SAFLEID;
+      return errorMessage.INVALID_SAFLEID;
     }
 
     try {
@@ -249,13 +262,13 @@ class SafleID {
     const isSafleIdRegOnHold = await this.isRegistrationPaused();
 
     if (isSafleIdRegOnHold) {
-      return SAFLEID_REG_ON_HOLD;
+      return errorMessage.SAFLEID_REG_ON_HOLD;
     }
 
     const addressOfSafleId = await this.getAddress(newSafleId);
 
     if (addressOfSafleId !== '0x0000000000000000000000000000000000000000') {
-      return SAFLEID_ALREADY_TAKEN;
+      return errorMessage.SAFLEID_ALREADY_TAKEN;
     }
 
     const updateCount = await this.getUpdateCount(userAddress);
@@ -263,9 +276,9 @@ class SafleID {
     const isSafleIDValid = await isSafleIdValid(newSafleId);
 
     if (updateCount >= 2) {
-      return SAFLEID_MAX_COUNT;
+      return errorMessage.SAFLEID_MAX_COUNT;
     } if (isSafleIDValid === false) {
-      return INVALID_SAFLEID;
+      return errorMessage.INVALID_SAFLEID;
     }
 
     try {
@@ -286,7 +299,7 @@ class SafleID {
 
       return response;
     } catch (error) {
-      return INVALID_INPUT;
+      return errorMessage.INVALID_INPUT;
     }
   }
 }

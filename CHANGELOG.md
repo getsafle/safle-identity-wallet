@@ -54,3 +54,9 @@
 ##### Updated README
 
 *Updated all the instances of inblox to safle in the README file.
+
+#### 1.1.1 (2022-02-02)
+
+##### Resolve old SafleId
+
+*Created a method to resolve the old safleId of a user.

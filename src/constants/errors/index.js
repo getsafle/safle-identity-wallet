@@ -7,4 +7,6 @@ module.exports = {
   ADDRESS_ALREADY_TAKEN: 'This address is already mapped to another Safle ID',
   SAFLEID_ALREADY_TAKEN: 'This Safle ID is already mapped to another address',
   SAFLE_ID_NOT_REGISTERED: 'This SafleID is not registered.',
+  NO_SAFLEID: 'No SafleID is registered for this index number.',
+  INVALID_ENV_INPUT: 'Invalid env input.',
 };

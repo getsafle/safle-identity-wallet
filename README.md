@@ -132,6 +132,21 @@ Address of the user.
 
 SafleId registration fees.
 
+> Resolve old safleIds of a user
+
+---
+
+* ```resolveOldSafleId()```
+
+#### Input
+
+```address``` - Address of the user.
+```index``` - Index of the old SafleId.
+
+#### Output
+
+Old safleId of the user at that index.
+
 ## WIP
 
 Want to contribute, we would :heart: that!
