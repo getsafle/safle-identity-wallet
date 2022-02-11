@@ -67,3 +67,8 @@
 
 *Added method to resolve safleId from coin address.
 *Added method to coin address from safleId and chainId.
+
+#### 1.2.2 (2022-02-11)
+
+##### Updated Polygon RPC URL's
+
