@@ -6,5 +6,5 @@ module.exports = {
   CHAIN_ID_MATIC_TESTNET: 80001,
   CHAIN_ID_MATIC_MAINNET: 137,
   MATIC_TESTNET_RPC_URL: 'https://rpc-mumbai.matic.today',
-  MATIC_MAINNET_RPC_URL:  'https://polygon-rpc.com',
+  MATIC_MAINNET_RPC_URL: 'https://polygon-rpc.com',
 };
