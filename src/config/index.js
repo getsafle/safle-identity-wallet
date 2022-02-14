@@ -5,6 +5,6 @@ module.exports = {
   STORAGE_CONTRACT_MATIC_MAINNET: '0x330b4d83830aaB73FC24B66751a02a6EE693671e',
   CHAIN_ID_MATIC_TESTNET: 80001,
   CHAIN_ID_MATIC_MAINNET: 137,
-  MATIC_TESTNET_RPC_URL: 'https://polygon-rpc.com',
-  MATIC_MAINNET_RPC_URL: 'https://rpc-mumbai.matic.today',
+  MATIC_TESTNET_RPC_URL: 'https://rpc-mumbai.matic.today',
+  MATIC_MAINNET_RPC_URL:  'https://polygon-rpc.com',
 };
