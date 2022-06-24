@@ -24,7 +24,10 @@ Import the package into your project using,
 
 Initialise the constructor using your Infura secret key or RPC URL like this,
 
-```const safle = new safleId(env);```
+```const safle = new safleId(env, rpcUrl);```
+
+* `env` - The network to perform the blockchain queries. (valid values - `mainnet` or `testnet`).
+* `rpcUrl` - RPC URL for the specified network env.
 
 
 ### List of all functions

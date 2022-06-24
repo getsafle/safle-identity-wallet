@@ -72,3 +72,6 @@
 
 ##### Updated Polygon RPC URL's
 
+#### 1.3.0 (2022-06-24)
+
+##### [Breaking Change] - Now constructor parameter also accepts `rpcUrl`.
