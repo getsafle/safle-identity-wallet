@@ -9,8 +9,6 @@ const {
   STORAGE_CONTRACT_MATIC_MAINNET,
   CHAIN_ID_MATIC_TESTNET,
   CHAIN_ID_MATIC_MAINNET,
-  MATIC_TESTNET_RPC_URL,
-  MATIC_MAINNET_RPC_URL,
 } = require('./config');
 
 const errorMessage = require('./constants/errors');
@@ -21,11 +19,11 @@ let web3;
 async function getContractAddress(env) {
   if (env === 'testnet') {
     return {
-      main: MAIN_CONTRACT_MATIC_TESTNET, storage: STORAGE_CONTRACT_MATIC_TESTNET, chainId: CHAIN_ID_MATIC_TESTNET, rpcUrl: MATIC_TESTNET_RPC_URL,
+      main: MAIN_CONTRACT_MATIC_TESTNET, storage: STORAGE_CONTRACT_MATIC_TESTNET, chainId: CHAIN_ID_MATIC_TESTNET,
     };
   } if (env === 'mainnet') {
     return {
-      main: MAIN_CONTRACT_MATIC_MAINNET, storage: STORAGE_CONTRACT_MATIC_MAINNET, chainId: CHAIN_ID_MATIC_MAINNET, rpcUrl: MATIC_MAINNET_RPC_URL,
+      main: MAIN_CONTRACT_MATIC_MAINNET, storage: STORAGE_CONTRACT_MATIC_MAINNET, chainId: CHAIN_ID_MATIC_MAINNET,
     };
   }
 
@@ -85,8 +83,8 @@ async function isSafleIdValid(safleId) {
 }
 
 class SafleID {
-  constructor(env) {
-    web3 = new Web3(new Web3.providers.HttpProvider(env === 'mainnet' ? MATIC_MAINNET_RPC_URL : MATIC_TESTNET_RPC_URL));
+  constructor(env, rpcUrl) {
+    web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
     this.MainContractABI = mainContractABI;
     this.StorageContractABI = storageContractABI;
     this.env = env;
